@@ -118,7 +118,16 @@ webSocketServer.on("connection", (socket) => {
       try {
         const joined = rooms.joinRoom(message.roomCode, { connectionId: state.id, ...state.identity });
         const room = rooms.roomForConnection(state.id)!;
-        send(state, { type: "room_joined", roomCode: room.code, peerId: joined.peerId, hostPeerId: 1, mode: room.mode, mapId: room.mapId });
+        send(state, {
+          type: "room_joined",
+          roomCode: room.code,
+          peerId: joined.peerId,
+          hostPeerId: 1,
+          mode: room.mode,
+          mapId: room.mapId,
+          // New clients need every current player, not just themselves and host.
+          peers: [...room.peers.values()].map((peer) => ({ peerId: peer.peerId, displayName: peer.displayName })),
+        });
         broadcast(room, { type: "peer_joined", peerId: joined.peerId, displayName: joined.displayName }, state.id);
       } catch (error) {
         const code = error instanceof Error ? error.message : "join_failed";

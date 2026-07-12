@@ -60,11 +60,12 @@ export const clientSignalSchema = z.discriminatedUnion("type", [
 export type ClientSignal = z.infer<typeof clientSignalSchema>;
 export type RoomMode = "ffa" | "duel";
 export type MapId = z.infer<typeof mapIdSchema>;
+export type RoomPeer = { peerId: number; displayName: string };
 
 export type ServerSignal =
   | { type: "authenticated"; userId: string; displayName: string; iceServers: unknown[] }
   | { type: "room_created"; roomCode: string; peerId: 1; mode: RoomMode; mapId: MapId }
-  | { type: "room_joined"; roomCode: string; peerId: number; hostPeerId: 1; mode: RoomMode; mapId: MapId }
+  | { type: "room_joined"; roomCode: string; peerId: number; hostPeerId: 1; mode: RoomMode; mapId: MapId; peers: RoomPeer[] }
   | { type: "peer_joined"; peerId: number; displayName: string }
   | { type: "peer_left"; peerId: number }
   | { type: "room_locked" }
