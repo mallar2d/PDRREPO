@@ -55,6 +55,7 @@ export const clientSignalSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("leave_room") }),
   z.object({ type: z.literal("lock_room") }),
   z.object({ type: z.literal("heartbeat") }),
+  z.object({ type: z.literal("list_rooms") }),
 ]);
 
 export type ClientSignal = z.infer<typeof clientSignalSchema>;
@@ -72,7 +73,17 @@ export type ServerSignal =
   | ({ sourcePeerId: number } & Extract<ClientSignal, { type: "offer" | "answer" | "ice_candidate" }>)
   | { type: "room_closed"; reason: "host_left" | "idle_timeout" }
   | { type: "heartbeat_ack"; serverTime: number }
+  | { type: "room_list"; rooms: RoomSummary[] }
   | { type: "error"; code: string; message: string };
+
+export interface RoomSummary {
+  roomCode: string;
+  mode: RoomMode;
+  mapId: MapId;
+  playerCount: number;
+  maxPlayers: number;
+  locked: boolean;
+}
 
 export function parseClientSignal(raw: string): ClientSignal | null {
   if (Buffer.byteLength(raw, "utf8") > 70_000) return null;

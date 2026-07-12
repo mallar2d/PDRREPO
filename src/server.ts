@@ -146,6 +146,9 @@ webSocketServer.on("connection", (socket) => {
       }
       return;
     }
+    if (message.type === "list_rooms") {
+      return send(state, { type: "room_list", rooms: rooms.listActiveRooms() });
+    }
 
     const room = rooms.roomForConnection(state.id);
     const source = room?.peers.get(state.id);

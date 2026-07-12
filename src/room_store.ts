@@ -1,4 +1,4 @@
-import type { MapId, RoomMode } from "./protocol.js";
+import type { MapId, RoomMode, RoomSummary } from "./protocol.js";
 
 const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
@@ -116,6 +116,23 @@ export class RoomStore {
       this.rooms.delete(room.code);
     }
     return expired;
+  }
+
+  listActiveRooms(): RoomSummary[] {
+    const result: RoomSummary[] = [];
+    for (const room of this.rooms.values()) {
+      if (room.locked) continue;
+      const maxPlayers = room.mode === "duel" ? 2 : 12;
+      result.push({
+        roomCode: room.code,
+        mode: room.mode,
+        mapId: room.mapId,
+        playerCount: room.peers.size,
+        maxPlayers,
+        locked: room.locked,
+      });
+    }
+    return result;
   }
 }
 
